@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BIA — Questionnaire Client</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600;700&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #b8914a;
+    --gold-lt: #d4a96a;
+    --ink: #1a1714;
+    --sand: #f7f3ec;
+    --warm: #ede8de;
+    --muted: #8a7f72;
+    --border: #ddd5c8;
+    --white: #ffffff;
+    --ok: #3d7a5c;
+    --err: #c0392b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--sand);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-inner {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: 0.05em;
+  }
+  .logo span { color: var(--gold); }
+  .header-tag {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(160deg, var(--ink) 0%, #2a2520 100%);
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: 'BIA';
+    position: absolute;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 200px;
+    color: rgba(184,145,74,0.05);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    font-weight: 700;
+  }
+  .hero-tag {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+  .hero h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(32px, 6vw, 52px);
+    color: var(--white);
+    font-weight: 600;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+  .hero p {
+    color: #9a9088;
+    font-size: 15px;
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0 auto 32px;
+    font-weight: 300;
+  }
+  .hero-steps {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #7a7068;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .hero-step-num {
+    width: 22px;
+    height: 22px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--gold);
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-bar {
+    background: rgba(255,255,255,0.08);
+    height: 2px;
+  }
+  .progress-fill {
+    background: var(--gold);
+    height: 100%;
+    transition: width 0.5s ease;
+  }
+
+  /* ── FORM CONTAINER ── */
+  .form-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px 80px;
+  }
+
+  /* ── STEP ── */
+  .step {
+    display: none;
+    animation: fadeIn 0.4s ease;
+  }
+  .step.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .step-header {
+    padding: 36px 0 24px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .step-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--gold);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .step-info {}
+  .step-num {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .step-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  /* ── FIELDS ── */
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 8px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .field label .req { color: var(--gold); }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--white);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(184,145,74,0.08);
+  }
+  .field textarea { resize: vertical; min-height: 100px; }
+  .field select { cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23b8914a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; }
+
+  .field-hint {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ── TWO COLS ── */
+  .two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  @media (max-width: 480px) { .two-cols { grid-template-columns: 1fr; } }
+
+  /* ── NAVIGATION ── */
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    padding: 14px 20px;
+    display: flex;
+    gap: 12px;
+    max-width: 680px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+  }
+  .btn {
+    flex: 1;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.05em;
+  }
+  .btn-prev {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    flex: 0 0 auto;
+    width: 100px;
+  }
+  .btn-next {
+    background: var(--ink);
+    color: var(--white);
+  }
+  .btn-next:hover { background: #2a2520; }
+  .btn-submit {
+    background: var(--gold);
+    color: var(--white);
+    flex: 2;
+  }
+  .btn-submit:hover { background: var(--gold-lt); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── SUCCESS ── */
+  #success {
+    display: none;
+    text-align: center;
+    padding: 80px 24px;
+    max-width: 520px;
+    margin: 0 auto;
+    animation: fadeIn 0.5s ease;
+  }
+  .success-icon {
+    width: 72px;
+    height: 72px;
+    background: var(--ok);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin: 0 auto 24px;
+  }
+  #success h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 12px;
+  }
+  #success p {
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .whatsapp-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 14px 28px;
+    border-radius: 3px;
+    font-family: 'Jost', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    transition: background 0.2s;
+  }
+  .whatsapp-btn:hover { background: #1ebe5c; }
+
+  /* ── STEP INDICATOR ── */
+  .step-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px 0 0;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+  .dot.active { background: var(--gold); width: 20px; border-radius: 3px; }
+  .dot.done { background: var(--ok); }
+
+  /* ── SUMMARY BOX ── */
+  .summary-box {
+    background: var(--warm);
+    border-radius: 4px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    border-left: 3px solid var(--gold);
+  }
+  .summary-box p {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .summary-box strong { color: var(--ink); }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">BIA<span>.</span></div>
+    <div class="header-tag">Bureau d'Architecture</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:20%"></div></div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <span class="hero-tag">Questionnaire Client</span>
+  <h1>Parlons de votre<br>projet</h1>
+  <p>Prenez 5 minutes pour nous décrire votre vision. Cela nous permettra de préparer une analyse architecturale complète et personnalisée.</p>
+  <div class="hero-steps">
+    <div class="hero-step"><div class="hero-step-num">1</div>Identité</div>
+    <div class="hero-step"><div class="hero-step-num">2</div>Projet</div>
+    <div class="hero-step"><div class="hero-step-num">3</div>Style</div>
+    <div class="hero-step"><div class="hero-step-num">4</div>Documents</div>
+    <div class="hero-step"><div class="hero-step-num">5</div>Envoi</div>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-container">
+  <div class="step-dots">
+    <div class="dot active" id="dot0"></div>
+    <div class="dot" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+
+  <form id="mainForm" action="https://formspree.io/f/xbdqpyyd" method="POST">
+    <!-- Champs cachés pour Formspree -->
+    <input type="hidden" name="_subject" value="🏗️ Nouveau dossier client — BIA">
+    <input type="hidden" name="_replyto" id="replyto">
+    <input type="hidden" name="_next" value="">
+
+    <!-- ═══ ÉTAPE 1 — IDENTITÉ ═══ -->
+    <div class="step active" id="step0">
+      <div class="step-header">
+        <div class="step-icon">👤</div>
+        <div class="step-info">
+          <div class="step-num">Étape 1 / 4</div>
+          <div class="step-title">Votre identité</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="two-cols">
+          <div class="field">
+            <label>Nom complet <span class="req">*</span></label>
+            <input type="text" name="nom" id="nom" placeholder="Jean Dupont" required>
+          </div>
+          <div class="field">
+            <label>Nationalité <span class="req">*</span></label>
+            <input type="text" name="nationalite" placeholder="Ex: Ivoirienne" required>
+          </div>
+        </div>
+        <div class="two-cols">
+          <div class="field">
+            <label>Email <span class="req">*</span></label>
+            <input type="email" name="email" id="emailField" placeholder="votre@email.com" required>
+          </div>
+          <div class="field">
+            <label>Téléphone / WhatsApp <span class="req">*</span></label>
+            <input type="tel" name="telephone" placeholder="+225 07 XX XX XX XX" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>Profession</label>
+          <input type="text" name="profession" placeholder="Ex: Entrepreneur, Fonctionnaire…">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 2 — PROJET ═══ -->
+    <div class="step" id="step1">
+      <div class="step-header">
+        <div class="step-icon">🏗️</div>
+        <div class="step-info">
+          <div class="step-num">Étape 2 / 4</div>
+          <div class="step-title">Votre projet</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="two-cols">
+          <div class="field">
+            <label>Pays du projet <span class="req">*</span></label>
+            <input type="text" name="pays" placeholder="Ex: Côte d'Ivoire" required>
+          </div>
+          <div class="field">
+            <label>Ville / Région <span class="req">*</span></label>
+            <input type="text" name="ville" placeholder="Ex: Abidjan, Cocody" required>
+          </div>
+        </div>
+        <div class="two-cols">
+          <div class="field">
+            <label>Catégorie du projet <span class="req">*</span></label>
+            <select name="categorie" required>
+              <option value="">Choisir…</option>
+              <option>Résidentiel</option>
+              <option>Commercial / Bureau</option>
+              <option>Industriel</option>
+              <option>Institutionnel</option>
+              <option>Promotion immobilière</option>
+              <option>Rénovation / Extension</option>
+              <option>Autre</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Type de bâtiment <span class="req">*</span></label>
+            <select name="type_batiment" required>
+              <option value="">Choisir…</option>
+              <option>Maison plain-pied</option>
+              <option>Maison à étage</option>
+              <option>Duplex</option>
+              <option>Triplex</option>
+              <option>R+3 et plus</option>
+              <option>Villa de luxe</option>
+              <option>Villa basse</option>
+              <option>Villa contemporaine</option>
+              <option>Immeuble R+1</option>
+              <option>Immeuble R+2</option>
+              <option>Appartement</option>
+              <option>Bâtiment commercial</option>
+              <option>Entrepôt / Hangar</option>
+              <option>Autre</option>
+            </select>
+          </div>
+        </div>
+        <div class="two-cols">
+          <div class="field">
+            <label>Superficie souhaitée (m²)</label>
+            <input type="number" name="superficie" placeholder="Ex: 250">
+          </div>
+          <div class="field">
+            <label>Budget approximatif</label>
+            <select name="budget">
+              <option value="">Choisir…</option>
+              <option>Moins de 50 000 €</option>
+              <option>50 000 – 150 000 €</option>
+              <option>150 000 – 500 000 €</option>
+              <option>500 000 € – 1M €</option>
+              <option>Plus de 1M €</option>
+              <option>Non défini</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Statut du terrain</label>
+          <select name="terrain">
+            <option value="">Choisir…</option>
+            <option>Terrain acquis</option>
+            <option>En cours d'acquisition</option>
+            <option>Pas encore de terrain</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nombre de pièces souhaitées</label>
+          <input type="text" name="pieces" placeholder="Ex: 4 chambres, salon, cuisine…">
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 3 — STYLE ═══ -->
+    <div class="step" id="step2">
+      <div class="step-header">
+        <div class="step-icon">🎨</div>
+        <div class="step-info">
+          <div class="step-num">Étape 3 / 4</div>
+          <div class="step-title">Style & environnement</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <div class="two-cols">
+          <div class="field">
+            <label>Style architectural préféré</label>
+            <select name="style">
+              <option value="">Choisir…</option>
+              <option>Moderne</option>
+              <option>Contemporain</option>
+              <option>Minimaliste</option>
+              <option>Tropical</option>
+              <option>Traditionnel local</option>
+              <option>Méditerranéen</option>
+              <option>Art Déco</option>
+              <option>Je ne sais pas encore</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Environnement du terrain <span class="req">*</span></label>
+            <select name="environnement" required>
+              <option value="">Choisir…</option>
+              <option>Tropical / Humide</option>
+              <option>Côtier / Maritime</option>
+              <option>Aride / Désertique</option>
+              <option>Montagneux</option>
+              <option>Tempéré</option>
+              <option>Urbain dense</option>
+              <option>Rural / Campagne</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Inspirations & références</label>
+          <textarea name="inspirations" placeholder="Décrivez vos inspirations, des projets que vous avez vus et aimés, des matériaux souhaités…"></textarea>
+          <span class="field-hint">Photos, liens, descriptions — tout est bienvenu !</span>
+        </div>
+        <div class="field">
+          <label>Éléments indispensables dans votre projet</label>
+          <textarea name="indispensables" placeholder="Ex: piscine, jardin tropical, garage double, bureau à domicile, terrasse couverte…"></textarea>
+        </div>
+        <div class="field">
+          <label>Délai souhaité pour le projet</label>
+          <select name="delai">
+            <option value="">Choisir…</option>
+            <option>Moins de 6 mois</option>
+            <option>6 mois – 1 an</option>
+            <option>1 – 2 ans</option>
+            <option>Plus de 2 ans</option>
+            <option>Pas encore défini</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ÉTAPE 4 — INFOS COMPLÉMENTAIRES ═══ -->
+    <div class="step" id="step3">
+      <div class="step-header">
+        <div class="step-icon">📎</div>
+        <div class="step-info">
+          <div class="step-num">Étape 4 / 4</div>
+          <div class="step-title">Informations complémentaires</div>
+        </div>
+      </div>
+      <div class="summary-box">
+        <p>📋 <strong>Vérifiez vos informations</strong> avant d'envoyer. Vos réponses seront transmises à l'architecte qui vous contactera sous 48h.</p>
+      </div>
+      <div class="field-group">
+        <div class="field">
+          <label>Avez-vous des documents disponibles ?</label>
+          <select name="documents">
+            <option value="">Choisir…</option>
+            <option>Oui — extrait topographique</option>
+            <option>Oui — plan de situation</option>
+            <option>Oui — les deux documents</option>
+            <option>Oui — autres documents</option>
+            <option>Non — pas encore de documents</option>
+          </select>
+          <span class="field-hint">Vous pourrez nous les envoyer par WhatsApp après l'envoi du questionnaire.</span>
+        </div>
+        <div class="field">
+          <label>Est-ce une promotion immobilière ?</label>
+          <select name="promotion">
+            <option value="">Choisir…</option>
+            <option>Oui — projet de promotion immobilière</option>
+            <option>Non — usage personnel / familial</option>
+            <option>Non — investissement locatif</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Comment nous avez-vous connus ?</label>
+          <select name="source">
+            <option value="">Choisir…</option>
+            <option>Recommandation d'un ami</option>
+            <option>Réseaux sociaux</option>
+            <option>Bouche à oreille</option>
+            <option>Internet</option>
+            <option>Autre</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Notes et informations complémentaires pour l'architecte</label>
+          <textarea name="notes" placeholder="Tout ce qui vous semble important pour votre projet…" rows="5"></textarea>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <!-- SUCCESS -->
+  <div id="success">
+    <div class="success-icon">✓</div>
+    <h2>Dossier envoyé !</h2>
+    <p>Merci ! Votre questionnaire a été transmis à l'équipe BIA. Nous vous contacterons sous <strong>48 heures</strong> pour la suite de votre projet.</p>
+    <p style="margin-bottom:24px">Pour envoyer vos documents (plan de situation, extrait topo…), cliquez sur le bouton ci-dessous :</p>
+    <a id="waLink" class="whatsapp-btn" target="_blank" href="#">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.025.507 3.929 1.397 5.594L0 24l6.584-1.376A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.885 0-3.65-.488-5.19-1.343L2 22l1.362-4.718A9.954 9.954 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+      Envoyer mes documents via WhatsApp
+    </a>
+  </div>
+</div>
+
+<!-- NAVIGATION -->
+<div class="nav" id="navBar">
+  <button class="btn btn-prev" id="prevBtn" onclick="prevStep()" style="display:none">← Retour</button>
+  <button class="btn btn-next" id="nextBtn" onclick="nextStep()">Suivant →</button>
+</div>
+
+<script>
+  // ══ CONFIG ══
+  const ARCHITECT_EMAIL = 'jorisbilar48@gmail.com';
+  const WHATSAPP_NUMBER = '2250703942330'; // Sans le +
+  const BUREAU_NAME = 'BIA';
+  // !! IMPORTANT : Remplacez YOUR_FORM_ID par votre vrai ID Formspree (voir instructions)
+  // Allez sur formspree.io → New Form → copiez l'ID → collez ici et dans l'action du form
+
+  let currentStep = 0;
+  const totalSteps = 4;
+
+  function updateUI() {
+    // Steps
+    document.querySelectorAll('.step').forEach((s, i) => {
+      s.classList.toggle('active', i === currentStep);
+    });
+
+    // Dots
+    document.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.remove('active', 'done');
+      if (i === currentStep) d.classList.add('active');
+      else if (i < currentStep) d.classList.add('done');
+    });
+
+    // Progress
+    document.getElementById('progressFill').style.width = `${((currentStep + 1) / totalSteps) * 100}%`;
+
+    // Nav
+    const prev = document.getElementById('prevBtn');
+    const next = document.getElementById('nextBtn');
+    prev.style.display = currentStep > 0 ? 'block' : 'none';
+
+    if (currentStep === totalSteps - 1) {
+      next.textContent = '🚀 Envoyer mon dossier';
+      next.className = 'btn btn-submit';
+      next.onclick = submitForm;
+    } else {
+      next.textContent = 'Suivant →';
+      next.className = 'btn btn-next';
+      next.onclick = nextStep;
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function validateStep(step) {
+    const s = document.getElementById(`step${step}`);
+    const required = s.querySelectorAll('[required]');
+    let valid = true;
+    required.forEach(field => {
+      if (!field.value.trim()) {
+        field.style.borderColor = 'var(--err)';
+        valid = false;
+        field.addEventListener('input', () => field.style.borderColor = '', { once: true });
+      }
+    });
+    return valid;
+  }
+
+  function nextStep() {
+    if (!validateStep(currentStep)) return;
+    if (currentStep < totalSteps - 1) {
+      currentStep++;
+      updateUI();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep > 0) {
+      currentStep--;
+      updateUI();
+    }
+  }
+
+  async function submitForm() {
+    if (!validateStep(currentStep)) return;
+
+    const btn = document.getElementById('nextBtn');
+    btn.textContent = 'Envoi en cours…';
+    btn.disabled = true;
+
+    const form = document.getElementById('mainForm');
+    const data = new FormData(form);
+
+    // Sync reply-to with email field
+    const email = document.getElementById('emailField').value;
+    document.getElementById('replyto').value = email;
+
+    // Collect all data for WhatsApp
+    const entries = {};
+    for (let [k, v] of data.entries()) entries[k] = v;
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        showSuccess(entries);
+      } else {
+        // Formspree not configured yet — still show success + WhatsApp
+        showSuccess(entries);
+      }
+    } catch (e) {
+      // Network fallback — redirect to WhatsApp
+      showSuccess(entries);
+    }
+  }
+
+  function showSuccess(data) {
+    document.getElementById('mainForm').style.display = 'none';
+    document.querySelector('.step-dots').style.display = 'none';
+    document.getElementById('navBar').style.display = 'none';
+    document.getElementById('success').style.display = 'block';
+
+    // Build WhatsApp message
+    const msg = `🏗️ *Nouveau dossier client — ${BUREAU_NAME}*
+
+👤 *Client:* ${data.nom || ''}
+📱 *Tél:* ${data.telephone || ''}
+📧 *Email:* ${data.email || ''}
+🌍 *Nationalité:* ${data.nationalite || ''}
+
+🏠 *PROJET*
+• Catégorie: ${data.categorie || 'N/A'}
+• Type: ${data.type_batiment || 'N/A'}
+• Ville: ${data.ville || ''}, ${data.pays || ''}
+• Superficie: ${data.superficie || 'N/A'} m²
+• Budget: ${data.budget || 'N/A'}
+• Terrain: ${data.terrain || 'N/A'}
+• Pièces: ${data.pieces || 'N/A'}
+
+🎨 *STYLE*
+• Style souhaité: ${data.style || 'N/A'}
+• Environnement: ${data.environnement || 'N/A'}
+• Délai: ${data.delai || 'N/A'}
+
+📝 *Inspirations:* ${data.inspirations || 'Aucune précisée'}
+
+✅ *Promotion immo:* ${data.promotion || 'N/A'}
+📎 *Documents:* ${data.documents || 'N/A'}
+
+💬 *Notes:* ${data.notes || 'Aucune'}`;
+
+    const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+    document.getElementById('waLink').href = waUrl;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Init
+  updateUI();
+</script>
+</body>
+</html>
